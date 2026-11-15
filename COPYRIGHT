@@ -1,0 +1,7 @@
+Copyright © 2026 DoronWolinsky. All rights reserved.
+
+This repository is published for viewing as a portfolio. No license is granted to use, copy, modify, merge,
+publish, distribute, sublicense or sell the source code or any part of it, except for the rights that GitHub's
+Terms of Service grant to other GitHub users (viewing and forking the repository on GitHub).
+
+Third-party libraries named in pyproject.toml are installed separately and remain under their own licenses.

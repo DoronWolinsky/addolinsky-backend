@@ -1,0 +1,45 @@
+[project]
+name = "addolinsky-components"
+version = "0.2.0"
+description = "Selected backend components of the Addolinsky Stremio subtitle service"
+requires-python = ">=3.12,<3.13"
+license = { text = "Proprietary. All rights reserved." }
+dependencies = [
+    "fastapi>=0.115",
+    "uvicorn>=0.30",
+    "pysubs2>=1.7",
+    "pydantic>=2.7",
+    "httpx>=0.27",
+    "python-dotenv>=1.0",
+    "charset-normalizer>=3.3",
+    "langcodes>=3.4",
+    "PyJWT[crypto]>=2.8",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8", "ruff>=0.5"]
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+include = ["addolinsky*"]
+
+[tool.setuptools.package-data]
+addolinsky = ["static/*.html", "static/*.js"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q -p no:cacheprovider"
+
+[tool.ruff]
+line-length = 110
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP"]
+ignore = ["E501"]
+
+[tool.ruff.lint.per-file-ignores]
+"addolinsky/api/*" = ["B008"]

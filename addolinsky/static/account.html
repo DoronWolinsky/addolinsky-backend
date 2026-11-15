@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="referrer" content="no-referrer">
+<title>Addolinsky — חשבון</title>
+<style>
+  :root{--bg:#fff;--fg:#1b1b1b;--muted:#555;--line:#ddd;--accent:#1a5fb4;--bad:#a51d2d;--ok:#26a269;--card:#fafafa}
+  @media (prefers-color-scheme: dark){:root{--bg:#161616;--fg:#eee;--muted:#aaa;--line:#444;--accent:#7ea2ff;--bad:#ff8a80;--ok:#7bd88f;--card:#1e1e1e}}
+  body{font:17px/1.6 system-ui,sans-serif;max-width:640px;margin:24px auto;padding:0 16px;color:var(--fg);background:var(--bg)}
+  h1{font-size:1.5em;margin:0 0 .5em} h2{font-size:1.15em;margin:0 0 .4em}
+  section{border:1px solid var(--line);border-radius:10px;padding:14px 16px;margin:14px 0;background:var(--card)}
+  label{display:block;margin:.6em 0 .2em}
+  input[type=email],input[type=password],input[type=text]{width:100%;box-sizing:border-box;font-size:17px;padding:9px;
+    border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--fg)}
+  button{font-size:17px;padding:9px 14px;margin:.5em 0 0;border-radius:8px;border:1px solid var(--line);
+    background:var(--bg);color:var(--fg);cursor:pointer;min-height:44px}
+  button.primary{background:var(--accent);color:#fff;border-color:var(--accent)}
+  button:disabled{opacity:.55;cursor:not-allowed}
+  .row{display:flex;flex-wrap:wrap;gap:8px}
+  .msg{min-height:1.4em;color:var(--bad)} .msg.ok{color:var(--ok)}
+  .small{font-size:.9em;color:var(--muted)}
+  dl{display:grid;grid-template-columns:max-content 1fr;gap:4px 14px;margin:.3em 0} dt{color:var(--muted)} dd{margin:0}
+  ul{padding-inline-start:1.2em;margin:.3em 0}
+  code{word-break:break-all}
+  [hidden]{display:none!important}
+</style>
+<script type="application/json" id="cfg">{{CONFIG}}</script>
+<script type="module" src="/account/account.js"></script>
+</head>
+<body>
+<h1>Addolinsky — חשבון</h1>
+<p class="msg" id="msg" role="status" aria-live="polite"></p>
+
+<section id="signin">
+  <h2>התחברות</h2>
+  <button type="button" id="google" class="primary">התחברות עם Google</button>
+  <form id="pwform" novalidate>
+    <label for="email">דוא"ל</label>
+    <input type="email" id="email" autocomplete="email" dir="ltr" required>
+    <label for="password">סיסמה</label>
+    <input type="password" id="password" autocomplete="current-password" dir="ltr" required>
+    <div class="row">
+      <button type="submit" id="pwsignin">התחברות עם סיסמה</button>
+      <button type="button" id="pwregister">הרשמה עם דוא"ל וסיסמה</button>
+      <button type="button" id="pwreset">שכחתי סיסמה</button>
+    </div>
+  </form>
+</section>
+
+<section id="verify" hidden>
+  <h2>אימות דוא"ל</h2>
+  <p>שלחנו קישור אימות אל <span id="verifyemail" dir="ltr"></span>. אחרי האימות לחצו "אימתתי".</p>
+  <div class="row">
+    <button type="button" id="verified" class="primary">אימתתי</button>
+    <button type="button" id="resend">שליחה חוזרת</button>
+  </div>
+</section>
+
+<section id="onboard" hidden>
+  <h2>ברוכים הבאים</h2>
+  <p>מחוברים בתור <span id="who" dir="ltr"></span>. ההתחברות הזו עדיין אינה מקושרת לחשבון Addolinsky.</p>
+
+  <h2>כבר מותקן אצלכם Addolinsky ב-Stremio?</h2>
+  <form id="linkform" novalidate>
+    <label for="installlink">קישור ההתקנה האישי שלכם ב-Stremio</label>
+    <input type="password" id="installlink" autocomplete="off" spellcheck="false" dir="ltr" required>
+    <label><input type="checkbox" id="linkconfirm"> אני מאשר/ת לקשר את ההתחברות הזו לחשבון שבקישור. הקישור עצמו לא ישתנה.</label>
+    <button type="submit" class="primary">קישור החשבון הקיים</button>
+  </form>
+
+  <h2>חשבון חדש</h2>
+  <form id="registerform" novalidate>
+    <p class="small" id="regclosed">ההרשמה הציבורית עדיין סגורה. אם קיבלתם קוד הזמנה, הזינו אותו כאן.</p>
+    <div id="inviteblock">
+      <label for="invite">קוד הזמנה</label>
+      <input type="text" id="invite" autocomplete="off" spellcheck="false" dir="ltr">
+    </div>
+    <label id="termsrow" hidden><input type="checkbox" id="acceptterms"> קראתי ואני מסכים/ה ל<a href="/terms" target="_blank" rel="noopener">תנאי השימוש</a> ול<a href="/privacy" target="_blank" rel="noopener">מדיניות הפרטיות</a>.</label>
+    <button type="submit" class="primary">יצירת חשבון</button>
+  </form>
+  <p class="small">לקישור או ליצירת חשבון נדרשת התחברות מהדקות האחרונות.</p>
+</section>
+
+<section id="newlink" hidden>
+  <h2 class="ok">קישור ההתקנה האישי שלכם</h2>
+  <p><strong>הקישור מוצג פעם אחת בלבד.</strong> שמרו אותו לעצמכם ואל תשתפו אותו: מי שמחזיק בו משתמש בשירות בשמכם.</p>
+  <label for="newlinkvalue">קישור ההתקנה</label>
+  <input type="text" id="newlinkvalue" readonly dir="ltr">
+  <div class="row">
+    <button type="button" id="copylink">העתקה</button>
+    <button type="button" id="installstremio" class="primary">התקנה ב-Stremio</button>
+    <button type="button" id="newlinkdone">סיימתי, להמשך</button>
+  </div>
+</section>
+
+<section id="dash" hidden>
+  <h2>החשבון שלי</h2>
+  <dl>
+    <dt>מחובר בתור</dt><dd id="dEmail" dir="ltr"></dd>
+    <dt>שיטת התחברות</dt><dd id="dProvider" dir="ltr"></dd>
+    <dt>מסלול</dt><dd id="dPlan"></dd>
+    <dt>בתוקף עד</dt><dd id="dPaid"></dd>
+    <dt>תרגומים חדשים</dt><dd id="dCredits"></dd>
+  </dl>
+  <ul id="dGrants"></ul>
+</section>
+
+<section id="dashBilling" hidden>
+  <h2>מנוי</h2>
+  <p id="bText"></p>
+  <div class="row" id="planOffers"></div>
+  <div class="row">
+    <button type="button" id="cancelRenewal" hidden>ביטול חידוש אוטומטי</button>
+    <button type="button" id="resumeRenewal" hidden>חידוש המנוי</button>
+  </div>
+  <p class="small">ביטול החידוש אינו מפסיק את Premium מיד: הגישה נמשכת עד סוף התקופה ששולמה.</p>
+</section>
+
+<section id="dashLink" hidden>
+  <h2>קישור ההתקנה ב-Stremio</h2>
+  <p class="small">מטעמי אבטחה הקישור נשמר אצלנו רק בצורה מוצפנת חד-כיוונית, ולכן אי אפשר להציג אותו שוב. אם איבדתם אותו, צרו קישור חדש: הקישור הישן יפסיק לעבוד מיד ויהיה צריך להתקין את התוסף מחדש.</p>
+  <button type="button" id="rotate">יצירת קישור התקנה חדש</button>
+</section>
+
+<section id="dashTranslations" hidden>
+  <h2>תרגומים שיצרתי</h2>
+  <p class="small">תרגומים שאתם יצרתם נשארים זמינים לכם גם בלי מנוי.</p>
+  <ul id="dTranslations"></ul>
+</section>
+
+<p><button type="button" id="signout" hidden>התנתקות</button></p>
+<p class="small"><a href="/terms">Terms</a> · <a href="/privacy">Privacy</a> · <a href="/policy">Copyright policy</a></p>
+</body>
+</html>
